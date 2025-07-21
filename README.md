@@ -23,8 +23,9 @@ smart-goal-planner/
 │
 ├── src/
 │   ├── components/
-│   │   ├── GoalCard.jsx
-│   │   ├── GoalForm.jsx
+│   │   ├── GoalList.jsx
+        ├── GoalForm.jsx
+│   │   ├── GoalItem.jsx
 │   │   ├── DepositForm.jsx
 │   │   └── Overview.jsx
 │   ├── utils/
