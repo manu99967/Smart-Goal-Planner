@@ -1,47 +1,52 @@
 import { useEffect, useState } from "react";
-import { fetchGoals, createGoal, updateGoal, deleteGoal } from "./utils/api";
+import {
+  getGoals,
+  addGoal,
+  updateGoal,
+  deleteGoalById,
+  makeDeposit,
+} from "./utils/api";
 import GoalForm from "./components/GoalForm";
-import DepositForm from "./components/DepositForm.jsx";
-import GoalCard from "./components/GoalCard.jsx";
-import Overview from "./components/Overview.jsx";
+import GoalList from "./components/GoalList";
+import DepositForm from "./components/DepositForm";
+import Overview from "./components/Overview";
 
 function App() {
   const [goals, setGoals] = useState([]);
 
   useEffect(() => {
-    fetchGoals().then(setGoals);
+    getGoals().then(setGoals);
   }, []);
 
-  const handleAdd = (goal) => {
-    createGoal(goal).then((newGoal) => setGoals((prev) => [...prev, newGoal]));
+  const handleAddGoal = async (goal) => {
+    const newGoal = await addGoal(goal);
+    setGoals([...goals, newGoal]);
   };
 
-  const handleDelete = (id) => {
-    deleteGoal(id).then(() => setGoals((prev) => prev.filter((g) => g.id !== id)));
+  const handleUpdateGoal = async (id, updates) => {
+    const updated = await updateGoal(id, updates);
+    setGoals(goals.map(g => g.id === id ? updated : g));
   };
 
-  const handleDeposit = (id, amount) => {
-    const goal = goals.find((g) => g.id === id);
-    const updated = { savedAmount: goal.savedAmount + amount };
-    updateGoal(id, updated).then((newData) => {
-      setGoals((prev) => prev.map((g) => (g.id === id ? newData : g)));
-    });
+  const handleDelete = async (id) => {
+    await deleteGoalById(id);
+    setGoals(goals.filter(g => g.id !== id));
+  };
+
+  const handleDeposit = async (id, amount) => {
+    const updated = await makeDeposit(id, amount);
+    setGoals(goals.map(g => g.id === id ? updated : g));
   };
 
   return (
-    <div className="container">
-      <h1>Smart Goal Planner</h1>
-      <Overview goals={goals} />
-      <GoalForm onAdd={handleAdd} />
+    <div className="App">
+      <h1>SMART Goal Planner</h1>
+      <GoalForm onAddGoal={handleAddGoal} />
       <DepositForm goals={goals} onDeposit={handleDeposit} />
-      <div className="goal-list">
-        {goals.map((g) => (
-          <GoalCard key={g.id} goal={g} onDelete={handleDelete} />
-        ))}
-      </div>
+      <Overview goals={goals} />
+      <GoalList goals={goals} onUpdate={handleUpdateGoal} onDelete={handleDelete} />
     </div>
   );
 }
-
 export default App;
 

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-function GoalForm({ onAdd }) {
+function GoalForm({ onAddGoal }) {
   const [formData, setFormData] = useState({
     name: "",
     targetAmount: "",
@@ -8,25 +8,32 @@ function GoalForm({ onAdd }) {
     deadline: "",
   });
 
-  const handleChange = (e) =>
+  function handleChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
 
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
-    onAdd(formData);
+    const newGoal = {
+      ...formData,
+      id: crypto.randomUUID(),
+      targetAmount: parseFloat(formData.targetAmount),
+      savedAmount: 0,
+      createdAt: new Date().toISOString(),
+    };
+    onAddGoal(newGoal);
     setFormData({ name: "", targetAmount: "", category: "", deadline: "" });
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="form">
-      <h2>Add New Goal</h2>
+    <form onSubmit={handleSubmit}>
       <input name="name" value={formData.name} onChange={handleChange} placeholder="Goal Name" required />
-      <input name="targetAmount" value={formData.targetAmount} onChange={handleChange} placeholder="Target Amount" required type="number" />
-      <input name="category" value={formData.category} onChange={handleChange} placeholder="Category" required />
-      <input name="deadline" value={formData.deadline} onChange={handleChange} required type="date" />
+      <input name="targetAmount" value={formData.targetAmount} onChange={handleChange} type="number" placeholder="Target Amount" required />
+      <input name="category" value={formData.category} onChange={handleChange} placeholder="Category" />
+      <input name="deadline" value={formData.deadline} onChange={handleChange} type="date" required />
       <button type="submit">Add Goal</button>
     </form>
   );
 }
-
 export default GoalForm;
+

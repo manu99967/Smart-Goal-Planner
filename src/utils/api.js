@@ -1,19 +1,38 @@
-const API = "http://localhost:3000/goals";
+const BASE_URL = "http://localhost:3000/goals";
 
-export const fetchGoals = () => fetch(API).then((res) => res.json());
+export async function getGoals() {
+  const res = await fetch(BASE_URL);
+  return await res.json();
+}
 
-export const createGoal = (goal) =>
-  fetch(API, {
+export async function addGoal(goal) {
+  const res = await fetch(BASE_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(goal),
-  }).then((res) => res.json());
+  });
+  return await res.json();
+}
 
-export const updateGoal = (id, updates) =>
-  fetch(`${API}/${id}`, {
+export async function updateGoal(id, updates) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updates),
-  }).then((res) => res.json());
+  });
+  return await res.json();
+}
 
-export const deleteGoal = (id) => fetch(`${API}/${id}`, { method: "DELETE" });
+export async function deleteGoalById(id) {
+  await fetch(`${BASE_URL}/${id}`, { method: "DELETE" });
+}
+
+export async function makeDeposit(id, amount) {
+  const res = await fetch(`${BASE_URL}/${id}`);
+  const goal = await res.json();
+  const updated = {
+    savedAmount: goal.savedAmount + amount,
+  };
+  return await updateGoal(id, updated);
+}
+
